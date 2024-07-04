@@ -13,7 +13,6 @@
         src='@/assets/icons/star.png'
         />
       </div>
-
     </div>
   </div>
 </template>
