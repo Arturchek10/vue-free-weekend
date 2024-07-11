@@ -1,38 +1,56 @@
 <template>
   <div>
-    <CardForm v-if="!isLoading" @open-form='openForm' :movies="movies" />
-    <h1 class="loading-text" v-else>Loading...</h1>
+    <CardList v-if="!isLoading && movies.length >= 1" @open-form='openForm' :movies="movies" @removeCard="removeCard"/>
+    <h1 class="loading-text" v-else-if="isLoading">Loading...</h1>
+    <div class="none-cards" v-else-if="movies.length < 1">
+      <h1 class="none-cards-text">нет фильмов для просмотра</h1>
+      <button class="add-new-movie-btn" @click='openForm'>add new movie</button>
+    </div>
     <MovieForm v-if="formIsOpen" @create-card="createCard" @close-form="closeForm" />
   </div>
 </template>
 
 <script setup>
-import CardForm from '@/components/CardForm.vue'
+import CardList from '@/components/CardList.vue'
 import MovieForm from '@/components/MovieForm.vue'
 import {ref} from 'vue'
 
 const isLoading = ref(false)
-
 const formIsOpen = ref(false)
 
 const openForm = () => {
   console.log('openForm');
   formIsOpen.value = true 
+  document.body.classList.add('block-screen-scroll')
+  console.log(document.body.classList);
+  console.log('formIsOpen' + formIsOpen.value);
+  console.log('isLoading' + isLoading.value);
 }
 
 const createCard = (item) => {
-  console.log(item)
-  item.id = movies.value.length + 1
-  movies.value.push(item)
-  console.log(item.id)
-  closeForm()
-  isLoading.value = true
-  setTimeout(() => {isLoading.value = false}, 1500)
+  // console.log(item)
+  if(item.image && item.name && item.description){
+    item.id = movies.value.length + 1
+    movies.value.push(item)
+    // console.log(item.id)
+    closeForm()
+    isLoading.value = true
+    setTimeout(() => {isLoading.value = false}, 1500)
+  } else {
+    alert('заполните поля name, description, image')
+  }
 }
 
 const closeForm = () => {
   console.log('closeForm')
   formIsOpen.value = false
+  document.body.classList.remove('block-screen-scroll')
+}
+
+const removeCard = (id) => {
+  console.log(id);
+  console.log(movies.value);
+  movies.value.splice(id,1)
 }
 
 const movies = ref([
@@ -89,12 +107,40 @@ const movies = ref([
 
 </script>
 
-<style scoped>
+<style >
+
+.block-screen-scroll{
+  overflow: hidden;
+}
 
 .loading-text{
-  position: absolute;
-  transform: translate(700px, 150px);
+  font-size: 40px;
+  margin-left: 45%;
+  margin-top: 15%;
   color: #fff;
 }
 
+ /* .none-cards-text{
+  position: absolute;
+  transform: translate(550px, 200px);
+  color: #fff;
+} */
+
+.add-new-movie-btn{
+  font-size: 20px;
+  font-weight: 600;
+  width: 250px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: #0B9CE0;
+  cursor: pointer;
+  margin-top: 2em;
+}
+
+.none-cards{
+  color: #fff;
+  text-align: center;
+  margin-top: 15%;
+  font-size: 24px;
+}
 </style>

@@ -1,6 +1,9 @@
 <template>  
       <div class="card">
         <div class="img-card">
+          <div class="close-icon-div">
+            <img id='close-icon' src="@/assets/icons/close-gray.png" alt="" @click="$emit('removeCard', card.index)">
+          </div>
           <div class="rating-star" v-if="card.rating > 0">
             <img class="big-star-icon" src="@/assets/icons/big-star.png">
             <p class="rating-inside-star" >{{card.rating}}</p>
@@ -16,7 +19,11 @@
             <h3>{{ card.name }}</h3>
           </div>
           <div class="genre" v-if="card.genres.length >= 1">
-            <button  id="btn-genre">{{ card.genres[0] }}</button>
+            <button class="btn-genre">{{ card.genres[0] }}</button>
+            <button class="btn-genre" v-if="card.genres[1]" id="btn-genre">{{ card.genres[1] }}</button>
+            <button class="btn-genre" v-if="card.genres[2]" id="btn-genre">{{ card.genres[2] }}</button>
+            <button class="btn-genre" v-if="card.genres[3]" id="btn-genre">{{ card.genres[3] }}</button>
+            <button class="btn-genre" v-if="card.genres[4]" id="btn-genre">{{ card.genres[4] }}</button>
           </div>
           <div class="description">
             <p>{{ card.description }}</p>
@@ -90,10 +97,11 @@ const props = defineProps({
   transform: translate(20px, -2px);
 }
 
-#btn-genre {
+.btn-genre {
   border-radius: 20px;
   border: none;
   background: #6466f1;
+  margin-right: 5px;
 }
 
 .big-star-icon{
@@ -111,5 +119,16 @@ const props = defineProps({
   position: absolute;
   transform: translate(263px, 18px);
 }
+
+#close-icon{
+  position: absolute;
+  transform: translate(15px, 20px);
+  cursor: pointer;
+  opacity: 0.6;
+}
+#close-icon:hover{
+  opacity: 1;
+}
+
 
 </style>

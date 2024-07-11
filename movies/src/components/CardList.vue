@@ -4,10 +4,12 @@
       <button class="add-movie-btn" @click="$emit('open-form')">add movie</button>
     </div>
     <div class="div-cards-list">
-      <AppCard v-for="(item, index) in movies"
+      <AppCard v-for="(item, index) in movies "
       :key="item.id"
       :index="index"
-      :card="item" />
+      :card="item" 
+      @removeCard="$emit('removeCard', index)"
+      />
     </div>
 </div>
 </template>
@@ -15,6 +17,11 @@
 <script setup>
 import { ref } from "vue";
 import AppCard from "@/components/AppCard.vue"
+
+const handleEventInParent1 = () => {
+  console.log('handleEventInParent1');
+} 
+
 
 const props = defineProps({
   movies: {
@@ -29,7 +36,7 @@ const props = defineProps({
 
 .div-cards-list{
   width: 80%;
-  margin: 40px auto;
+  margin: 40px 70px 0px auto;
   display: flex;
   flex-wrap: wrap;
 }
