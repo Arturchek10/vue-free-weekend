@@ -18,10 +18,6 @@
 import { ref } from "vue";
 import AppCard from "@/components/AppCard.vue"
 
-const handleEventInParent1 = () => {
-  console.log('handleEventInParent1');
-} 
-
 
 const props = defineProps({
   movies: {

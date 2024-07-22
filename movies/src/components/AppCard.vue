@@ -110,9 +110,9 @@ const props = defineProps({
   transform: translate(250px, 15px);
 }
 .rating-inside-star{
-  font-size: 21px;
+  font-size: 18px;
   position: absolute;
-  transform: translate(262px, 22px);
+  transform: translate(262px, 25px);
 }
 .none-rating-inside-star{
   font-size: 25px;
@@ -130,5 +130,8 @@ const props = defineProps({
   opacity: 1;
 }
 
+h3{
+  margin-bottom: 5px;
+}
 
 </style>

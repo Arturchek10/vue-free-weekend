@@ -23,7 +23,7 @@
                   border-radius: 10px;
                   padding-left: 10px;
                 "
-                maxlength="220"
+                maxlength="160"
                 placeholder="enter text"
                 v-model="newCard.description"
               ></textarea>

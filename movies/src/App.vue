@@ -13,10 +13,19 @@
 <script setup>
 import CardList from '@/components/CardList.vue'
 import MovieForm from '@/components/MovieForm.vue'
-import {ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
+import {useMoviesStore} from '@/assets/stores/movies'
+
+const movieStore = useMoviesStore()
 
 const isLoading = ref(false)
 const formIsOpen = ref(false)
+
+const movies = computed(() => movieStore.movies)
+
+onMounted(() => {
+  movieStore.loadFromLocalStorage()
+})
 
 const openForm = () => {
   console.log('openForm');
@@ -28,11 +37,9 @@ const openForm = () => {
 }
 
 const createCard = (item) => {
-  // console.log(item)
   if(item.image && item.name && item.description){
     item.id = movies.value.length + 1
-    movies.value.push(item)
-    // console.log(item.id)
+    movieStore.addMovie(item)
     closeForm()
     isLoading.value = true
     setTimeout(() => {isLoading.value = false}, 1500)
@@ -48,61 +55,59 @@ const closeForm = () => {
 }
 
 const removeCard = (id) => {
-  console.log(id);
-  console.log(movies.value);
-  movies.value.splice(id,1)
+  movieStore.removeMovie(id)
 }
 
-const movies = ref([
-  {
-    id: 1,
-    name: "The Godfather",
-    description:
-      "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
-    image:
-      "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UY1982_.jpg",
-    rating: 0,
-    genres: ["Crime", "Drama"],
-    inTheaters: false,
-    isClick: false,
-  },
-  {
-    id: 2,
-    name: "The Shawshank Redemption",
-    description:
-      "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-    image:
-      "https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_FMjpg_UX1200_.jpg",
-    rating: 0,
-    genres: ["Drama"],
-    inTheaters: false,
-    isClick: false,
-  },
-  {
-    id: 3,
-    name: "The Dark Knight",
-    description:
-      "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
-    image:
-      "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UY2048_.jpg",
-    rating: 0,
-    genres: ["Action", "Crime", "Drama"],
-    inTheaters: false,
-    isClick: false,
-  },
-  {
-    id: 4,
-    name: "Forrest Gump",
-    description:
-      "The history of the United States from the 1950s to the '70s unfolds from the perspective of an Alabama man with an IQ of 75, who yearns to be reunited with his childhood sweetheart.",
-    image: "https://m.media-amazon.com/images/I/91++WV6FP4L._SL1500_.jpg",
-    rating: 0,
-    genres: ["Drama", "Romance"],
-    inTheaters: false,
-    isClick: false,
-  },
+// const movies = ref([
+//   {
+//     id: 1,
+//     name: "The Godfather",
+//     description:
+//       "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+//     image:
+//       "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UY1982_.jpg",
+//     rating: 0,
+//     genres: ["Crime", "Drama"],
+//     inTheaters: false,
+//     isClick: false,
+//   },
+//   {
+//     id: 2,
+//     name: "The Shawshank Redemption",
+//     description:
+//       "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+//     image:
+//       "https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_FMjpg_UX1200_.jpg",
+//     rating: 0,
+//     genres: ["Drama"],
+//     inTheaters: false,
+//     isClick: false,
+//   },
+//   {
+//     id: 3,
+//     name: "The Dark Knight",
+//     description:
+//       "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
+//     image:
+//       "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UY2048_.jpg",
+//     rating: 0,
+//     genres: ["Action", "Crime", "Drama"],
+//     inTheaters: false,
+//     isClick: false,
+//   },
+//   {
+//     id: 4,
+//     name: "Forrest Gump",
+//     description:
+//       "The history of the United States from the 1950s to the '70s unfolds from the perspective of an Alabama man with an IQ of 75, who yearns to be reunited with his childhood sweetheart.",
+//     image: "https://m.media-amazon.com/images/I/91++WV6FP4L._SL1500_.jpg",
+//     rating: 0,
+//     genres: ["Drama", "Romance"],
+//     inTheaters: false,
+//     isClick: false,
+//   },
 
-]);
+// ]);
 
 
 </script>
