@@ -3,9 +3,10 @@
     <div class="create-form-container">
       <div class="create-form">
         <div class="forms">
+          <h3 style="text-align: center; margin: 20px;">input the name of movie</h3>
           <div class="name-form">
             <form action="">
-              <p class="form-text">Name</p>
+              <!-- <p class="form-text">Name</p> -->
               <input
                 type="text"
                 placeholder="enter name"
@@ -13,7 +14,7 @@
               />
             </form>
           </div>
-          <div class="description-form">
+          <!-- <div class="description-form">
             <form action="">
               <p class="form-text">Description</p>
               <textarea
@@ -23,7 +24,7 @@
                   border-radius: 10px;
                   padding-left: 10px;
                 "
-                maxlength="160"
+                maxlength="165"
                 placeholder="enter text"
                 v-model="newCard.description"
               ></textarea>
@@ -48,23 +49,23 @@
                 multiple
                 v-model="newCard.genres"
               >
-                <option v-for="genre in genres" :key="genre.value">
+                <option v-for="genre in newCard.genres" :key="genre.value">
                   {{ genre.text }}
                 </option>
               </select>
-            </form>
-          </div>
-          <div class="in-theaters">
+            </form> -->
+          <!-- </div> -->
+          <!-- <div class="in-theaters">
             <input
               class="checkbox-in-theaters"
               type="checkbox"
               v-model="newCard.inTheaters"
             />
             <p>in theaters</p>
-          </div>
+          </div> -->
           <div class="create-cansel-buttons">
             <button id="cansel-btn" @click="$emit('close-form')">close</button>
-            <button id="create-btn" type="submit" @click="$emit('create-card', newCard)">create</button>
+            <button id="create-btn" type="submit" @click="handleCreateCard">create</button>
           </div>
         </div>
       </div>
@@ -74,19 +75,9 @@
 
 <script setup>
 import { ref } from "vue";
+import {getMovie} from "@/assets/api/movie"
 
-const props = defineProps({
-  newCard: {
-    type: Object,
-  },
-});
-
-const genres = ref([
-  { text: "Drama", value: "Drama" },
-  { text: "Crime", value: "Crime" },
-  { text: "Action", value: "Action" },
-  { text: "Comedy", value: "Comedy" },
-]);
+const emits = defineEmits(['close-form', 'create-card'])
 
 const newCard = ref({
   id: null,
@@ -94,8 +85,62 @@ const newCard = ref({
   description: null,
   image: null,
   genres: [],
-  inTheaters: false,
 });
+
+// const genres = ref([
+//   { text: "Drama", value: "Drama" },
+//   { text: "Crime", value: "Crime" },
+//   { text: "Action", value: "Action" },
+//   { text: "Comedy", value: "Comedy" },
+// ]);
+
+const handleCreateCard = async () => {
+  if(newCard.value.name ){
+    try{
+      const response = await getMovie(newCard.value.name)
+      if(response.Response === 'True'){
+        console.log(response.Title)
+        console.log(response.Genre.split(', '));
+        console.log(response.Poster)
+        console.log(response.Plot);
+        newCard.value.name = response.Title
+        newCard.value.genres = response.Genre.split(', ')
+        newCard.value.description = response.Plot
+        newCard.value.image = response.Poster
+        emits('create-card', newCard.value )
+        clearNewCard()
+      }
+    } catch(error) {
+      throw new Error (`error message: ${error.message}`)
+    }
+  }
+}
+
+const clearNewCard = () => {
+  newCard.value = {
+  id: null,
+  name: null,
+  description: null,
+  image: null,
+  genres: [],
+  }
+}
+
+
+
+// const loadMovie = async (title) => {
+//   try{
+//     const response = await getMovie(title)
+//     console.log(response);
+//   } catch(error) {
+//     throw new Error (`error is: ${error.message}`)
+//   }
+// }
+
+
+
+
+
 
 // const lockScroll = () => {
 //   document.body.classList.add('body-scroll-lock')
@@ -115,12 +160,13 @@ const newCard = ref({
   top: 50%; /* Расположить форму по вертикали на 50% экрана */
   left: 50%; /* Расположить форму по горизонтали на 50% экрана */
   transform: translate(-50%, -50%); /* Центрировать форму относительно её собственных размеров */
-  background: gray;
+  background: #848689;
   width: 500px;
-  height: 440px;
+  height: 200px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 999; /* Поднимает форму над остальными элементами */
+  border-radius: 10px;
 }
 
 .create-form-container {
@@ -132,14 +178,14 @@ const newCard = ref({
   background-color: rgba(0, 0, 0, 0.5); /* Затемнённый цвет фона */
   z-index: 998; /* Поднимает затемненный фон над остальными контентными элементами, но ниже формы */
 }
-
+/* 
 .forms {
   width: 100%;
   text-align: left;
   margin: 10px 15px;
-}
+} */
 input {
-  width: 80%;
+  width: 70%;
   border-radius: 5px;
   height: 25px;
   border: none;
@@ -148,6 +194,10 @@ input {
 
 form {
   margin-bottom: 20px;
+}
+
+.form-text{
+  margin-bottom: 5px;
 }
 
 .in-theaters {
@@ -169,8 +219,8 @@ form {
 .create-cansel-buttons {
   display: flex;
   justify-content: space-between;
-  padding-right: 50px;
-  margin-top: 30px;
+  padding: 0px 50px;
+  margin-top: 50px;
 }
 .create-cansel-buttons button{
   cursor: pointer;
@@ -179,11 +229,16 @@ form {
   border-radius: 5px;
   background: red;
   border: 0cap;
+  width: 50px;
+  font-weight: 500;
 }
 #create-btn {
   border-radius: 5px;
   background: #0b9ce0;
   height: 30px;
   border: 0cap;
+  width: 80px;
+  font-weight: 500;
 }
+
 </style>

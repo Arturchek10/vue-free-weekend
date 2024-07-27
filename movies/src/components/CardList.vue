@@ -17,14 +17,27 @@
 <script setup>
 import { ref } from "vue";
 import AppCard from "@/components/AppCard.vue"
+import { getMovie } from "@/assets/api/movie";
+import { onMounted } from "vue";
 
 
 const props = defineProps({
   movies: {
     type: Array
-  }
+  },
 })
 
+// const loadMovie = async (title) => {
+//   try{
+//     const response = await getMovie(title)
+//     console.log(response);
+//   } catch(error) {
+//     throw new Error (`error is: ${error.message}`)
+//   }
+// }
+// onMounted(() => {
+//   loadMovie('The Godfather')
+// })
 
 </script>
 
@@ -32,17 +45,19 @@ const props = defineProps({
 
 .div-cards-list{
   width: 80%;
-  margin: 40px 70px 0px auto;
+  margin: 40px 150px 0px auto;
   display: flex;
   flex-wrap: wrap;
 }
 
 .add-movie-btn{
-  width: 90px;
-  height: 30px;
+  width: 120px;
+  height: 40px;
   border-radius: 10px;
   background-color: #0B9CE0;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
 }
 .button-div{
   text-align: end;

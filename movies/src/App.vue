@@ -3,6 +3,7 @@
     <CardList v-if="!isLoading && movies.length >= 1" @open-form='openForm' :movies="movies" @removeCard="removeCard"/>
     <h1 class="loading-text" v-else-if="isLoading">Loading...</h1>
     <div class="none-cards" v-else-if="movies.length < 1">
+      <img class="sad-smile-icon" src="./assets/icons/sad-face.svg" alt="">
       <h1 class="none-cards-text">нет фильмов для просмотра</h1>
       <button class="add-new-movie-btn" @click='openForm'>add new movie</button>
     </div>
@@ -28,24 +29,20 @@ onMounted(() => {
 })
 
 const openForm = () => {
-  console.log('openForm');
   formIsOpen.value = true 
   document.body.classList.add('block-screen-scroll')
-  console.log(document.body.classList);
-  console.log('formIsOpen' + formIsOpen.value);
-  console.log('isLoading' + isLoading.value);
 }
 
 const createCard = (item) => {
-  if(item.image && item.name && item.description){
+  // if(item.image && item.name && item.description){
     item.id = movies.value.length + 1
     movieStore.addMovie(item)
     closeForm()
     isLoading.value = true
     setTimeout(() => {isLoading.value = false}, 1500)
-  } else {
-    alert('заполните поля name, description, image')
-  }
+  // } else {
+    // alert('заполните поля name, description, image')
+  // }
 }
 
 const closeForm = () => {
@@ -57,7 +54,6 @@ const closeForm = () => {
 const removeCard = (id) => {
   movieStore.removeMovie(id)
 }
-
 // const movies = ref([
 //   {
 //     id: 1,
@@ -145,7 +141,13 @@ const removeCard = (id) => {
 .none-cards{
   color: #fff;
   text-align: center;
-  margin-top: 15%;
+  margin-top: 10%;
   font-size: 24px;
 }
+
+.sad-smile-icon{
+  width: 90px;
+
+}
+
 </style>

@@ -24,6 +24,12 @@ export const useMoviesStore = defineStore('movies', () => {
       }
     }
     
-   return { movies, addMovie, removeMovie, saveToLocalStorage, loadFromLocalStorage }
+    const updateMovie = (index, updatedMovie) => {
+      movies.value[index] = updatedMovie
+      saveToLocalStorage()
+    }
+
+
+   return { movies, addMovie, removeMovie, saveToLocalStorage, updateMovie, loadFromLocalStorage }
 
 })
