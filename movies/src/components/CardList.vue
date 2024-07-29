@@ -51,6 +51,7 @@ const props = defineProps({
 }
 
 .add-movie-btn{
+  position: fixed;
   width: 120px;
   height: 40px;
   border-radius: 10px;
@@ -58,6 +59,7 @@ const props = defineProps({
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
+  transform: translate(-130px, 0px);
 }
 .button-div{
   text-align: end;

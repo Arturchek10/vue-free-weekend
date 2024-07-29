@@ -1,68 +1,31 @@
 <template>
   <div class="main">
     <div class="create-form-container">
-      <div class="create-form">
+      <!-- click.stop ? -->
+      <div class="create-form" @click.stop="openSuggestionForm">
         <div class="forms">
           <h3 style="text-align: center; margin: 20px;">input the name of movie</h3>
           <div class="name-form">
-            <form action="">
-              <!-- <p class="form-text">Name</p> -->
+            <form action="" @submit.prevent="handleCreateCard">
+              <!-- @focus ? -->
               <input
                 type="text"
                 placeholder="enter name"
-                v-model.trim="newCard.name"
+                v-model.trim="query"
+                @click="openSuggestionForm"
+                @focus="openSuggestionForm" 
+                @input="fetchSuggestions"
               />
+              <ul v-if="suggestions.length && suggestionsIsOpen === true" class="suggestions-list">
+                <li
+                  v-for="suggestion in suggestions" 
+                  :key="suggestion.imdbID"
+                  @click="selectSuggestion(suggestion)"
+                >{{ suggestion.Title }} 
+              </li>
+              </ul>
             </form>
           </div>
-          <!-- <div class="description-form">
-            <form action="">
-              <p class="form-text">Description</p>
-              <textarea
-                style="
-                  height: 50px;
-                  width: 80%;
-                  border-radius: 10px;
-                  padding-left: 10px;
-                "
-                maxlength="165"
-                placeholder="enter text"
-                v-model="newCard.description"
-              ></textarea>
-            </form>
-          </div>
-          <div class="image-form">
-            <form action="">
-              <p class="form-text">Image</p>
-              <input
-                type="text"
-                placeholder="enter path"
-                v-model="newCard.image"
-              />
-            </form>
-          </div>
-          <div class="genres-form">
-            <form action="">
-              <p class="form-text">Genres</p>
-              <select
-                class="select-dropdown"
-                placeholder="enter name"
-                multiple
-                v-model="newCard.genres"
-              >
-                <option v-for="genre in newCard.genres" :key="genre.value">
-                  {{ genre.text }}
-                </option>
-              </select>
-            </form> -->
-          <!-- </div> -->
-          <!-- <div class="in-theaters">
-            <input
-              class="checkbox-in-theaters"
-              type="checkbox"
-              v-model="newCard.inTheaters"
-            />
-            <p>in theaters</p>
-          </div> -->
           <div class="create-cansel-buttons">
             <button id="cansel-btn" @click="$emit('close-form')">close</button>
             <button id="create-btn" type="submit" @click="handleCreateCard">create</button>
@@ -74,8 +37,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import {getMovie} from "@/assets/api/movie"
+import { onMounted, onBeforeUnmount, ref, watch } from "vue";
+import {getMovie, searchMovies} from "@/assets/api/movie"
 
 const emits = defineEmits(['close-form', 'create-card'])
 
@@ -87,22 +50,19 @@ const newCard = ref({
   genres: [],
 });
 
-// const genres = ref([
-//   { text: "Drama", value: "Drama" },
-//   { text: "Crime", value: "Crime" },
-//   { text: "Action", value: "Action" },
-//   { text: "Comedy", value: "Comedy" },
-// ]);
+const query = ref('')
+const suggestions = ref([])
 
+const suggestionsIsOpen = ref(false)
+
+// проблема не передается навание фильма
 const handleCreateCard = async () => {
+  // console.log('handleCreateCard');
+  // console.log(newCard.value.name);
   if(newCard.value.name ){
     try{
       const response = await getMovie(newCard.value.name)
       if(response.Response === 'True'){
-        console.log(response.Title)
-        console.log(response.Genre.split(', '));
-        console.log(response.Poster)
-        console.log(response.Plot);
         newCard.value.name = response.Title
         newCard.value.genres = response.Genre.split(', ')
         newCard.value.description = response.Plot
@@ -124,33 +84,99 @@ const clearNewCard = () => {
   image: null,
   genres: [],
   }
+  query.value = ''
+  suggestionsIsOpen.value = false
 }
 
+const fetchSuggestions = async () => {
+  // console.log('fetchSuggestions');
+  if(query.value.length > 2){
+    try {
+      const response = await searchMovies(query.value)
+      suggestions.value = response.slice(0,5)
+      // console.log(suggestions);
+    } catch (error){
+      throw new Error (`error: ${error.message}`)
+    }
+  } else {
+    suggestions.value = []
+  }
+}
 
+const selectSuggestion = async (suggestion) => {
+  // console.log('selectSuggestion'); 
+  // console.log(`suggestion: ${suggestion}`);
+  const response = await getMovie(suggestion.Title)
+  // console.log(`response : ${response}`);
+  try{
+    if (response.Response === 'True'){
+      query.value = suggestion.Title  
+      newCard.value.name = response.Title
+      newCard.value.genres = response.Genre.split(', ')
+      newCard.value.description = response.Plot
+      newCard.value.image = response.Poster
+      
+      emits("create-card", newCard.value)
+      suggestions.value = []  
+      clearNewCard()
+    }
+  } catch(error) {
+    throw new Error (`Error message: ${error.message}`)
+  }
+}
 
-// const loadMovie = async (title) => {
-//   try{
-//     const response = await getMovie(title)
-//     console.log(response);
-//   } catch(error) {
-//     throw new Error (`error is: ${error.message}`)
-//   }
-// }
+const closeSuggestionForm = () => {
+  suggestionsIsOpen.value = false
+}
 
+const openSuggestionForm = () => {
+  suggestionsIsOpen.value = true
+}
 
+const handleClickOutside = (event) => {
+  // event.target.closest(.className) ?
+  if(!event.target.closest('.create-form')){
+    closeSuggestionForm()
+  }
+}
 
+watch(
+  () => newCard.value.name, 
+  (newVal, oldVal) => {
+    console.log(newVal)
+    console.log(oldVal);
+})
 
+watch(
+  () => query.value,
+  (newVal) => {
+    // console.log(suggestions.value)
+    // console.log(newVal.length);
+    // console.log(suggestionsIsOpen.value)
+    if(newVal.length > 2){
+      suggestionsIsOpen.value = true
+      // console.log(`newVal.length > 2, so ${suggestionsIsOpen.value}`);
+    }
+    if(newVal.length < 2){
+      suggestions.value = []
+    }
+  } 
+)
 
+watch(
+  () => suggestionsIsOpen.value,
+  (newVal) => {
+    console.log(`watch suggestionsIsOpen : ${newVal}`)
+  }
+)
 
-// const lockScroll = () => {
-//   document.body.classList.add('body-scroll-lock')
-// }
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
 
-// const unLockScroll = () => {
-//   document.body.classList.remove('body-scroll-lock')
-// }
-
-
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 </script>
 
@@ -178,15 +204,10 @@ const clearNewCard = () => {
   background-color: rgba(0, 0, 0, 0.5); /* Затемнённый цвет фона */
   z-index: 998; /* Поднимает затемненный фон над остальными контентными элементами, но ниже формы */
 }
-/* 
-.forms {
-  width: 100%;
-  text-align: left;
-  margin: 10px 15px;
-} */
+
 input {
   width: 70%;
-  border-radius: 5px;
+  background: #f1f1f1;
   height: 25px;
   border: none;
   padding-left: 5px;
@@ -241,4 +262,22 @@ form {
   font-weight: 500;
 }
 
+.suggestions-list{
+  position: fixed;
+  background: white;
+  list-style: none;
+  width: 358px;
+  margin-left: 71px;
+  margin-top: 2px;
+  padding: 0px 0px;
+}
+
+li{
+  cursor: pointer;
+  padding: 3px;
+  border-bottom: 1px solid #d4d4d4;
+}
+li:hover{
+  background: #8ed0ef;
+}
 </style>
