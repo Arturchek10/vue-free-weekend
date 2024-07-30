@@ -59,7 +59,9 @@ const props = defineProps({
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  transform: translate(-130px, 0px);
+  transform: translate(-130px, -20px);
+  border: none;
+  z-index: 200;
 }
 .button-div{
   text-align: end;

@@ -28,7 +28,7 @@
           </div>
           <div class="create-cansel-buttons">
             <button id="cansel-btn" @click="$emit('close-form')">close</button>
-            <button id="create-btn" type="submit" @click="handleCreateCard">create</button>
+            <!-- <button id="create-btn" type="submit" @click="handleCreateCard">create</button> -->
           </div>
         </div>
       </div>
@@ -238,10 +238,10 @@ form {
 }
 
 .create-cansel-buttons {
-  display: flex;
+  /* display: flex;
   justify-content: space-between;
   padding: 0px 50px;
-  margin-top: 50px;
+  margin-top: 50px; */
 }
 .create-cansel-buttons button{
   cursor: pointer;
@@ -250,7 +250,9 @@ form {
   border-radius: 5px;
   background: red;
   border: 0cap;
-  width: 50px;
+  width: 60px;
+  height: 30px;
+  margin-top: 30px;
   font-weight: 500;
 }
 #create-btn {

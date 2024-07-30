@@ -2,10 +2,10 @@ import '@/assets/styles/global.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import { createPinia } from 'pinia'
-
+import router from './assets/router/router'
 const pinia = createPinia()
 const app = createApp(App)
-// createApp(App).mount('#app')
 
 app.use(pinia)
+app.use(router)
 app.mount('#app')
