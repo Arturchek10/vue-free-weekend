@@ -1,0 +1,67 @@
+/* @media( min-width: 320px){
+  .card-list-component{
+    margin-top: 20%;
+  };
+}   */
+
+/* @media( min-width: 1024px){
+  .card-list-component{
+    margin-top: 5%;
+  };
+} */
+
+.block-screen-scroll{
+  overflow: hidden;
+}
+
+.loading-text{
+  font-size: 40px;
+  margin-left: 45%;
+  margin-top: 15%;
+  color: #fff;
+}
+
+.add-new-movie-btn{
+  font-size: 20px;
+  font-weight: 600;
+  width: 250px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: #0B9CE0;
+  cursor: pointer;
+  margin-top: 2em;
+  transition: 0.5s;
+}
+.add-new-movie-btn:hover{
+  opacity: 0.8;
+}
+.none-cards{
+  color: #fff;
+  text-align: center;
+  margin-top: 5%;
+  font-size: 24px;
+}
+
+.sad-smile-icon{
+  width: 90px;
+}
+
+.add-movie-btn {
+  position: fixed;
+  width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #0B9CE0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  top: 20px; /* Устанавливаем фиксированное положение по вертикали */
+  right: 100px; /* Устанавливаем фиксированное положение по горизонтали */
+  border: none;
+  z-index: 1000;
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Плавные переходы */
+}
+
+.add-movie-btn:hover {
+  opacity: 0.8; /* Меняем прозрачность */
+}

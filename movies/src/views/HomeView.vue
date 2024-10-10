@@ -13,23 +13,16 @@
         <li>Делитесь своими любимыми фильмами: Поделитесь вашими рекомендациями с друзьями и семьей, используя уникальные ссылки на каждую карточку.</li>
         <li>Легкий поиск и фильтрация: Находите фильмы в вашей коллекции по жанру, названию или другим параметрам.</li>
       </ul>
-      
+      <video style="width: 1000px; margin-top: 20%; margin-left: -130px; margin-bottom: 50px;"  controls autoplay loop muted><source src="/src/assets/videos/video-for-homepage.mp4" type="video/mp4"></video>
+      <h3 >ПРИЯТНОГО ПОЛЬЗОВАНИЯ !</h3>
     </div>
 
-    <footer>
-      <div class="footer-container">
-        <a style="padding-left: 5%;">vk</a>
-        <a>instagram</a>
-        <a>telegram</a>
-        <a>8-951-842-45-96</a>
-        <a style="padding-right: 5%;">© Microsoft 2024</a>
-      </div>
-    </footer>
+    <Footer />
   </div>
 </template>
 
 <script setup>
-
+  import Footer from '@/components/Footer.vue';
 </script>
 
 <style scoped>
@@ -38,7 +31,7 @@
   margin-top: 3%;
   color: aliceblue;
   padding-top: 40px;
-  /* margin-left: 20%; */
+  width: 100%;
 }
 
 .title{
@@ -56,14 +49,6 @@
   padding: 20px;
 }
 
-.footer-container{
-  background: #C8ACD6;
-  display: flex;
-  height: 70px;
-  width: 100%;
-  font-size: 20px;
-  justify-content: space-between;
-  margin-top: 400px;
-  padding-top: 60px;
-}
+
+
 </style>

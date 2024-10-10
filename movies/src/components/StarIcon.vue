@@ -37,8 +37,22 @@ const toggleStar = () => {
 </script>
 
 <style scoped>
-.star-item {
-  margin-right: 3px;
-  cursor: pointer;
+
+@media(min-width: 320px){
+  .star-item {
+    margin-right: 3px;
+    cursor: pointer;
+    width: 16px;
+  }
 }
+
+@media(min-width: 1024px){
+  .star-item {
+    margin-right: 3px;
+    cursor: pointer;
+    width: 24px;
+  }
+}
+
+
 </style>
