@@ -43,8 +43,8 @@ onMounted(() => {viewedMoviesStore.loadFromLocalStorage()
 <style scoped>
 
 .viewed-card-list {
-  width: 80%;
-  margin: 40px 150px 0px auto;
+  width: 85%;
+  margin: 20px 130px 0px auto;
   display: flex;
   flex-wrap: wrap;
 }

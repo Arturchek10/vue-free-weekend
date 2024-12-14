@@ -6,8 +6,7 @@
         :key="item.id"
         :index="index"
         :card="item"
-        @removeCard="$emit('removeCard', index)"
-        
+        @removeCard="$emit('removeCard', index)" 
       />
     </div>
   </div>
@@ -22,8 +21,6 @@ const props = defineProps({
     type: Array,
   },
 });
-
-
 </script>
 
 <style scoped>

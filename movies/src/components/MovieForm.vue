@@ -1,32 +1,110 @@
 <template>
   <div class="main">
-    <div class="create-form-container">
+    <div class="create-form-container" :class="{'open': formIsOpen}" @click="$emit('close-form')">
+      <div class="overlay" >
+
+      </div>
       <div class="create-form" @click.stop="openSuggestionForm">
-        <div class="forms">
-          <h3 style="text-align: center; margin: 20px;">input the name of movie</h3>
-          <div class="name-form">
+        <div class="left-block">
+          <p class="meow">мяу</p>
+          <p class="question">?</p>
+        </div>
+        <div class="right-block">
+          <div class="forms">
+            <h3 id="choose-movie">ВЫБЕРИТЕ ФИЛЬМ</h3>
             <form action="" @submit.prevent="handleCreateCard">
               <input
+                class="input_name"
                 type="text"
-                placeholder="enter name"
+                placeholder="enter title of the movie"
                 v-model.trim="query"
+                @keydown.escape="$emit('close-form')"
                 @click="openSuggestionForm"
-                @focus="openSuggestionForm" 
+                @focus="openSuggestionForm"
                 @input="fetchSuggestions"
               />
-              <ul v-if="suggestions.length && suggestionsIsOpen === true" class="suggestions-list">
+              <ul
+                v-if="suggestions.length && suggestionsIsOpen === true"
+                class="suggestions-list"
+              >
                 <li
-                  v-for="suggestion in suggestions" 
+                  v-for="suggestion in suggestions"
                   :key="suggestion.imdbID"
                   @click="selectSuggestion(suggestion)"
-                >{{ suggestion.Title }} 
-              </li>
+                >
+                  {{ suggestion.Title }}
+                </li>
               </ul>
             </form>
+            <div class="forms">
+              <div class="genre-form">
+                <label for="genre" class="label-title">Жанр</label>
+                <select id="genre" class="input-field">
+                  <option value="" disabled selected>Выберите жанр</option>
+                  <option value="Action">Экшн</option>
+                  <option value="Drama">Драма</option>
+                  <option value="Comedy">Комедия</option>
+                  <option value="Horror">Ужасы</option>
+                </select>
+              </div>
+            </div>
+            <div class="forms">
+              <div class="type-form">
+                <label id="type-movie">Тип фильма</label>
+                <div class="radio-group">
+                  <label>
+                    <input type="radio" name="film-type" value="Standard" checked />
+                    Обычный
+                  </label>
+                  <label>
+                    <input type="radio" name="film-type" value="3D" />
+                    3D
+                  </label>
+                  <label>
+                    <input type="radio" name="film-type" value="IMAX" />
+                    IMAX
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="forms">
+              <div class="ratings-form">
+                <label for="rating">Рейтинг (1-10)</label>
+                <input
+                id="rating"
+                class="input-field"
+                type="range"
+                min="1"
+                max="10"
+                step="0.1"
+                v-model="rating"
+                />
+                <span id="rating-value">{{rating}}</span>
+              </div>
+            </div>
+            <div class="forms">
+              <div class="date-form">
+                <label for="release-year">Год выпуска</label>
+                <input
+                id="release-year"
+                class="input-field"
+                type="number"
+                placeholder="Введите год фильма"
+                min="1900"
+                max="2024"
+                />
+              </div>
+            </div>
+            <div class="forms">
+              <div class="checkbox-with-rules">
+                <label style="font-size: 15px;">
+                <input type="checkbox" >
+                нажимая сюда вы принимаете все условия
+              </label>
+              </div>
+            </div>
           </div>
-          <div class="create-cansel-buttons">
-            <button id="cansel-btn" @click="$emit('close-form')">close</button>
-          </div>
+          <button class="close-btn" @click="$emit('close-form')">close</button>
         </div>
       </div>
     </div>
@@ -34,10 +112,18 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from "vue";
-import {getMovie, searchMovies} from "@/assets/api/movie"
+import { onMounted, onBeforeUnmount, ref, watch, defineProps } from "vue";
+import { getMovie, searchMovies } from "@/assets/api/movie";
 
-const emits = defineEmits(['close-form', 'create-card'])
+
+const emits = defineEmits(["close-form", "create-card"]);
+
+const props = defineProps({
+  formIsOpen:{
+    type: Boolean,
+    required: true,
+  }
+})
 
 const newCard = ref({
   id: null,
@@ -47,216 +133,136 @@ const newCard = ref({
   genres: [],
 });
 
-const query = ref('')
-const suggestions = ref([])
+const query = ref("");
+const suggestions = ref([]);
 
-const suggestionsIsOpen = ref(false)
+const suggestionsIsOpen = ref(false);
+
+const rating = ref(5) // обновление рейтинга при прокрутке ползунка
 
 const handleCreateCard = async () => {
-  if(newCard.value.name ){
-    try{
-      const response = await getMovie(newCard.value.name)
-      if(response.Response === 'True'){
-        newCard.value.name = response.Title
-        newCard.value.genres = response.Genre.split(', ')
-        newCard.value.description = response.Plot
-        newCard.value.image = response.Poster
-        emits('create-card', newCard.value )
-        clearNewCard()
+  if (newCard.value.name) {
+    try {
+      const response = await getMovie(newCard.value.name);
+      if (response.Response === "True") {
+        newCard.value.name = response.Title;
+        newCard.value.genres = response.Genre.split(", ");
+        newCard.value.description = response.Plot;
+        newCard.value.image = response.Poster;
+
+        emits("create-card", newCard.value);
+        clearNewCard();
       }
-    } catch(error) {
-      throw new Error (`error message: ${error.message}`)
+    } catch (error) {
+      throw new Error(`error message: ${error.message}`);
     }
   }
-}
+};
 
 const clearNewCard = () => {
   newCard.value = {
-  id: null,
-  name: null,
-  description: null,
-  image: null,
-  genres: [],
-  }
-  query.value = ''
-  suggestionsIsOpen.value = false
-}
+    id: null,
+    name: null,
+    description: null,
+    image: null,
+    genres: [],
+  };
+  query.value = "";
+  suggestionsIsOpen.value = false;
+};
 
 const fetchSuggestions = async () => {
-  if(query.value.length > 2){
+  if (query.value.length >= 3) {
     try {
-      const response = await searchMovies(query.value)
-      suggestions.value = response.slice(0,5)
-    } catch (error){
-      throw new Error (`error: ${error.message}`)
+      const response = await searchMovies(query.value);
+      if (response.length > 5){
+        suggestions.value = response.slice(0, 5);
+        console.log(response.slice(0, 5));
+        
+      } else {
+        suggestions.value = response
+      }
+    } catch (error) {
+      throw new Error(`error: ${error.message}`);
     }
   } else {
-    suggestions.value = []
+    suggestions.value = [];
   }
-}
+};
+
+
 
 const selectSuggestion = async (suggestion) => {
-  const response = await getMovie(suggestion.Title)
-  try{
-    if (response.Response === 'True'){
-      query.value = suggestion.Title  
-      newCard.value.name = response.Title
-      newCard.value.genres = response.Genre.split(', ')
-      newCard.value.description = response.Plot
-      newCard.value.image = response.Poster
-      
-      emits("create-card", newCard.value)
-      suggestions.value = []  
-      clearNewCard()
+  const response = await getMovie(suggestion.Title);
+  try {
+    if (response.Response === "True") {
+      query.value = suggestion.Title;
+      newCard.value.name = response.Title;
+      newCard.value.genres = response.Genre.split(", ");
+      newCard.value.description = response.Plot;
+      newCard.value.image = response.Poster;
+
+      emits("create-card", newCard.value);
+      suggestions.value = [];
+      clearNewCard();
     }
-  } catch(error) {
-    throw new Error (`Error message: ${error.message}`)
+  } catch (error) {
+    throw new Error(`Error message: ${error.message}`);
   }
-}
+};
 
 const closeSuggestionForm = () => {
-  suggestionsIsOpen.value = false
-}
+  suggestionsIsOpen.value = false;
+};
 
 const openSuggestionForm = () => {
-  suggestionsIsOpen.value = true
-}
+  suggestionsIsOpen.value = true;
+};
 
 const handleClickOutside = (event) => {
-  if(!event.target.closest('.create-form')){
-    closeSuggestionForm()
+  if (!event.target.closest(".create-form")) {
+    closeSuggestionForm();
   }
-}
+};
 watch(
-  () => newCard.value.name, 
+  () => newCard.value.name,
   (newVal, oldVal) => {
-    console.log(newVal)
+    console.log(newVal);
     console.log(oldVal);
-})
+  }
+);
 
 watch(
   () => query.value,
   (newVal) => {
-    if(newVal.length > 2){
-      suggestionsIsOpen.value = true
+    if (newVal.length > 2) {
+      suggestionsIsOpen.value = true;
     }
-    if(newVal.length < 2){
-      suggestions.value = []
+    if (newVal.length < 2) {
+      suggestions.value = [];
     }
-  } 
-)
+  }
+);
 
 watch(
   () => suggestionsIsOpen.value,
   (newVal) => {
-    console.log(`watch suggestionsIsOpen : ${newVal}`)
+    console.log(`watch suggestionsIsOpen : ${newVal}`);
   }
-)
+);
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener("click", handleClickOutside);
+});
 
 onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
-<style>
-.create-form {
-  position: fixed;
-  top: 50%; 
-  left: 50%; 
-  transform: translate(-50%, -50%); /* Центрировать форму относительно её собственных размеров */
-  background: #848689;
-  width: 500px;
-  height: 200px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 999;
-  border-radius: 10px;
-}
 
-.create-form-container {
-  position: fixed; 
-  top: 0;
-  left: 0;
-  width: 100%; 
-  height: 100%; 
-  background-color: rgba(0, 0, 0, 0.5); 
-  z-index: 998; 
-}
+<style
+  scoped
+  src="C:\Users\artur\Desktop\Артур\js\free-weekend\free-week-proj\movies\src\assets\styles\movie-form.css"
+></style>
 
-input {
-  width: 70%;
-  background: #f1f1f1;
-  height: 25px;
-  border: none;
-  padding-left: 5px;
-}
-
-form {
-  margin-bottom: 20px;
-}
-
-.form-text{
-  margin-bottom: 5px;
-}
-
-.in-theaters {
-  display: flex;
-  margin-left: 5px;
-}
-.in-theaters p {
-  transform: translate(15px, 3px);
-}
-.checkbox-in-theaters {
-  width: 16px;
-}
-
-.select-dropdown {
-  width: 80%;
-  height: 60px;
-}
-
-.create-cansel-buttons button{
-  cursor: pointer;
-}
-#cansel-btn {
-  border-radius: 5px;
-  background: red;
-  border: 0cap;
-  width: 60px;
-  height: 30px;
-  margin-top: 30px;
-  font-weight: 500;
-}
-#create-btn {
-  border-radius: 5px;
-  background: #0b9ce0;
-  height: 30px;
-  border: 0cap;
-  width: 80px;
-  font-weight: 500;
-}
-
-.suggestions-list{
-  position: fixed;
-  background: white;
-  list-style: none;
-  width: 358px;
-  margin-left: 71px;
-  margin-top: 2px;
-  padding: 0px 0px;
-}
-
-li{
-  cursor: pointer;
-  padding: 3px;
-  border-bottom: 1px solid #d4d4d4;
-}
-li:hover{
-  background: #8ed0ef;
-}
-</style>

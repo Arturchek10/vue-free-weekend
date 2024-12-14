@@ -1,18 +1,3 @@
-/* @media( min-width: 320px){
-  .card-list-component{
-    margin-top: 20%;
-  };
-}   */
-
-/* @media( min-width: 1024px){
-  .card-list-component{
-    margin-top: 5%;
-  };
-} */
-
-.block-screen-scroll{
-  overflow: hidden;
-}
 
 .loading-text{
   font-size: 40px;
@@ -65,3 +50,5 @@
 .add-movie-btn:hover {
   opacity: 0.8; /* Меняем прозрачность */
 }
+
+

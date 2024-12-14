@@ -10,7 +10,7 @@
       <h1 class="none-cards-text">нет фильмов для просмотра</h1>
       <button class="add-new-movie-btn" @click='openForm'>add new movie</button>
     </div>
-    <MovieForm v-if="formIsOpen" @create-card="createCard" @close-form="closeForm" />
+    <MovieForm :formIsOpen="formIsOpen" @create-card="createCard" @close-form="closeForm" />
   </div>
 </template>
 
@@ -32,7 +32,8 @@ onMounted(() => {
 })
 
 const openForm = () => {
-  formIsOpen.value = true 
+  formIsOpen.value = true
+  console.log('formIsOpen ', formIsOpen.value)
   document.body.classList.add('block-screen-scroll')
 }
 
@@ -47,6 +48,8 @@ const createCard = (item) => {
 const closeForm = () => {
   console.log('closeForm')
   formIsOpen.value = false
+  console.log('formIsOpen ', formIsOpen.value);
+  
   document.body.classList.remove('block-screen-scroll')
 }
 
@@ -57,7 +60,6 @@ const removeCard = (id) => {
 
 </script>
 
-<style src="C:\Users\artur\Desktop\Артур\js\free-weekend\free-week-proj\movies\src\assets\styles\bigScreen.css">
-
+<style src="C:\Users\artur\Desktop\Артур\js\free-weekend\free-week-proj\movies\src\assets\styles\big-screen.css">
 
 </style>
