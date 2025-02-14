@@ -1,9 +1,13 @@
 <template>
   <div class="main">
-    <div class="create-form-container" :class="{'open': formIsOpen}" @click="$emit('close-form')">
-      <div class="overlay" >
-
-      </div>
+    <div
+      class="create-form-container"
+      :class="{ open: formIsOpen }"
+      @click="$emit('close-form')"
+      @keydown.esc="$emit('close-form')"
+      tabindex="0"
+    >
+      <div class="overlay"></div>
       <div class="create-form" @click.stop="openSuggestionForm">
         <div class="left-block">
           <p class="meow">мяу</p>
@@ -18,7 +22,8 @@
                 type="text"
                 placeholder="enter title of the movie"
                 v-model.trim="query"
-                @keydown.escape="$emit('close-form')"
+                ref="MovieInput"
+                @keyup.escape="$emit('close-form')"
                 @click="openSuggestionForm"
                 @focus="openSuggestionForm"
                 @input="fetchSuggestions"
@@ -53,7 +58,12 @@
                 <label id="type-movie">Тип фильма</label>
                 <div class="radio-group">
                   <label>
-                    <input type="radio" name="film-type" value="Standard" checked />
+                    <input
+                      type="radio"
+                      name="film-type"
+                      value="Standard"
+                      checked
+                    />
                     Обычный
                   </label>
                   <label>
@@ -71,36 +81,38 @@
               <div class="ratings-form">
                 <label for="rating">Рейтинг (1-10)</label>
                 <input
-                id="rating"
-                class="input-field"
-                type="range"
-                min="1"
-                max="10"
-                step="0.1"
-                v-model="rating"
+                  id="rating"
+                  class="input-field"
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.1"
+                  v-model="rating"
                 />
-                <span id="rating-value">{{rating}}</span>
+                <div class="rating-background" :class="{'rating-background-top': ratingTop, 'rating-background-low': ratingLow}">
+                  <span id="rating-value">{{ rating }} / 10</span>
+                </div>
               </div>
             </div>
             <div class="forms">
               <div class="date-form">
                 <label for="release-year">Год выпуска</label>
                 <input
-                id="release-year"
-                class="input-field"
-                type="number"
-                placeholder="Введите год фильма"
-                min="1900"
-                max="2024"
+                  id="release-year"
+                  class="input-field"
+                  type="number"
+                  placeholder="Введите год фильма"
+                  min="1900"
+                  max="2024"
                 />
               </div>
             </div>
             <div class="forms">
               <div class="checkbox-with-rules">
-                <label style="font-size: 15px;">
-                <input type="checkbox" >
-                нажимая сюда вы принимаете все условия
-              </label>
+                <label style="font-size: 15px">
+                  <input type="checkbox" />
+                  нажимая сюда вы принимаете все условия
+                </label>
               </div>
             </div>
           </div>
@@ -112,18 +124,17 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch, defineProps } from "vue";
-import { getMovie, searchMovies } from "@/assets/api/movie";
-
+import { onMounted, onBeforeUnmount, ref, watch, defineProps, computed } from "vue";
+import { getMovie, searchMovies } from "@/assets/api/backend/movie";
 
 const emits = defineEmits(["close-form", "create-card"]);
 
 const props = defineProps({
-  formIsOpen:{
+  formIsOpen: {
     type: Boolean,
     required: true,
-  }
-})
+  },
+});
 
 const newCard = ref({
   id: null,
@@ -135,11 +146,12 @@ const newCard = ref({
 
 const query = ref("");
 const suggestions = ref([]);
-
+const MovieInput = ref(null);
 const suggestionsIsOpen = ref(false);
 
-const rating = ref(5) // обновление рейтинга при прокрутке ползунка
-
+const rating = ref(6); // обновление рейтинга при прокрутке ползунка
+const ratingTop = computed(() => rating.value > 8)
+const ratingLow = computed(() => rating.value < 6)
 const handleCreateCard = async () => {
   if (newCard.value.name) {
     try {
@@ -175,12 +187,11 @@ const fetchSuggestions = async () => {
   if (query.value.length >= 3) {
     try {
       const response = await searchMovies(query.value);
-      if (response.length > 5){
+      if (response.length > 5) {
         suggestions.value = response.slice(0, 5);
         console.log(response.slice(0, 5));
-        
       } else {
-        suggestions.value = response
+        suggestions.value = response;
       }
     } catch (error) {
       throw new Error(`error: ${error.message}`);
@@ -189,8 +200,6 @@ const fetchSuggestions = async () => {
     suggestions.value = [];
   }
 };
-
-
 
 const selectSuggestion = async (suggestion) => {
   const response = await getMovie(suggestion.Title);
@@ -224,13 +233,13 @@ const handleClickOutside = (event) => {
     closeSuggestionForm();
   }
 };
-watch(
-  () => newCard.value.name,
-  (newVal, oldVal) => {
-    console.log(newVal);
-    console.log(oldVal);
-  }
-);
+// watch(
+//   () => newCard.value.name,
+//   (newVal, oldVal) => {
+    // console.log(newVal);
+    // console.log(oldVal);
+//   }
+// );
 
 watch(
   () => query.value,
@@ -244,12 +253,30 @@ watch(
   }
 );
 
-watch(
-  () => suggestionsIsOpen.value,
-  (newVal) => {
-    console.log(`watch suggestionsIsOpen : ${newVal}`);
-  }
-);
+// watch(
+//   () => suggestionsIsOpen.value,
+//   (newVal) => {
+    
+//     console.log(`watch suggestionsIsOpen : ${newVal}`);
+//   }
+// );
+
+// watch(
+//   () => props.formIsOpen,
+//   (newVal) => {
+//     if (newVal == true) {
+//       MovieInput.value.focus();
+//       console.log(MovieInput.value)
+//     }
+//     console.log(`formIsOpen ${newVal}`);
+//   }
+// )
+// watch(
+//   () => props.formIsOpen.value,
+//   (newVal) => {
+//     console.log(`formIsOpen: ${newVal}`)
+//   }
+// )
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
@@ -260,9 +287,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-
 <style
   scoped
   src="C:\Users\artur\Desktop\Артур\js\free-weekend\free-week-proj\movies\src\assets\styles\movie-form.css"
 ></style>
-

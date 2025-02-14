@@ -1,175 +1,145 @@
 <template>
   <div id="app">
-    <div class="auth-container">
-      <h1 v-if="!isLoggedIn">{{ isRegistering ? 'Регистрация' : 'Вход' }}</h1>
-      <h1 v-else>Добро пожаловать!</h1>
+    <div :class="[isMounted ? 'auth-container-view' : 'auth-container']">
+      <h1>Добро пожаловать!</h1>
 
-      <form v-if="!isLoggedIn" @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <label for="username">Логин</label>
-          <input 
-            v-model="form.username"
-            :class="{'error-input': isError}"
-            type="text"
-            id="username" 
-            
-          />
+      <form v-if="!isLoggedIn">
+        <!-- Форма авторизации -->
+        <div v-if="isLoginMode">
+          <div class="form-group">
+            <label for="login">Логин</label>
+            <input
+              v-model="form.login"
+              :class="{ 'error-input': isError }"
+              type="text"
+              id="login"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Пароль</label>
+            <input
+              v-model="form.password"
+              :class="{ 'error-input': isError }"
+              type="password"
+              id="password"
+            />
+          </div>
+
+          <button type="submit" @click.prevent="handleSubmit">Войти</button>
+          <p class="switch-form">
+            Еще нет аккаунта? 
+            <span @click="toggleFormMode" class="link">Зарегистрироваться</span>
+          </p>
         </div>
 
-        <div class="form-group">
-          <label for="password">Пароль</label>
-          <input 
-            v-model="form.password"
-            :class="{'error-input': isError}" 
-            type="password" 
-            id="password"  />
+        <!-- Форма регистрации -->
+        <div v-else>
+          <div class="form-group">
+            <label for="new-login">Логин</label>
+            <input v-model="form.login" type="text" id="new-login" />
+          </div>
+
+          <div class="form-group">
+            <label for="new-password">Пароль</label>
+            <input v-model="form.password" type="password" id="new-password" />
+          </div>
+
+          <button type="submit" @click.prevent="handleRegister">Зарегистрироваться</button>
+          <p class="switch-form">
+            Уже есть аккаунт? 
+            <span @click="toggleFormMode" class="link">Войти</span>
+          </p>
         </div>
-
-        <button type="submit">{{ isRegistering ? 'Зарегистрироваться' : 'Войти' }}</button>
-
-        <p class="toggle-text">
-          {{ isRegistering ? 'Уже есть аккаунт?' : 'Нет аккаунта?' }}
-          <a href="#" @click.prevent="toggleMode">
-            {{ isRegistering ? 'Войти' : 'Зарегистрироваться' }}
-          </a>
-        </p>
       </form>
 
       <div v-else>
-        <p>Вы вошли как: <strong>{{ form.username }}</strong></p>
-        <button @click="logout" class="button-exit">Exit</button>
+        <!-- Сообщение о входе -->
+        <p>
+          Вы вошли как: <strong>{{ form.login }}</strong>
+        </p>
+        <button @click="logout" class="button-exit">Выйти</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { useUserStore } from "@/assets/stores/user";
+import axios from "axios";
+
 export default {
-  
   data() {
     return {
-      isRegistering: false, // Режим регистрации или входа
       isLoggedIn: false, // Состояние входа
+      isLoginMode: true, // Состояние переключения формы
       isError: false,
+      isMounted: false,
+      loggedInUser: "",
       form: {
-        username: '',
-        password: '',
-        correct_username: 'Artur123',
-        correct_password: '123'
+        login: "",
+        password: "",
       },
     };
   },
   methods: {
-    // проверка правильности логина/пароля для входа 
-    handleSubmit() {
-      if (this.form.username && this.form.username === this.form.correct_username && this.form.password && this.form.password === this.form.correct_password) {
+    async handleSubmit() {
+      try {
+        const response = await axios.post("http://localhost:3000/login", {
+          login: this.form.login,
+          password: this.form.password,
+        });
         this.isLoggedIn = true;
-        this.$router.push('/movielist')
-        this.$emit("login", this.form.username);
-        console.log(this.isError);
-      } else {
-        console.log(this.isError)
+        this.loggedInUser = response.data.login;
+        const userStore = useUserStore();
+        userStore.setUsername(this.form.login);
+        this.$router.push("/movielist");
+      } catch (error) {
+        console.error("ошибка сервера или неправильный логин/пароль");
         this.isError = true;
-        this.form.username = '';
-        this.form.password = '';
+        this.form.login = "";
+        this.form.password = "";
       }
     },
-    toggleMode() {
-      this.isRegistering = !this.isRegistering;
+    async handleRegister() {
+      try {
+        const response = await axios.post("http://localhost:3000/register", {
+          login: this.form.login,
+          password: this.form.password,
+        });
+        alert(response.data.message);
+        this.$router.push("/movielist");
+        this.toggleFormMode(); // Переключение на форму авторизации после регистрации
+      } catch (error) {
+        console.error("Ошибка регистрации:", error);
+        alert("Ошибка регистрации. Попробуйте снова.");
+      }
     },
     logout() {
       this.isLoggedIn = false;
-      this.form.username = '';
-      this.form.password = '';
+      this.loggedInUser = "";
+      this.form.login = "";
+      this.form.password = "";
       this.isError = false;
     },
+    toggleFormMode() {
+      this.isLoginMode = !this.isLoginMode; // Переключение формы
+      this.isError = false;
+      this.form.login = "";
+      this.form.password = "";
+    },
+  },
+  beforeMount() {
+    this.isMounted = false;
+  },
+  mounted() {
+    setTimeout(() => {
+      this.isMounted = true;
+    }, 50);
   },
 };
 </script>
-
-<style scoped>
-#app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #111826;
-  font-family: Arial, sans-serif;
-}
-
-.auth-container {
-  background: #fafafc;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-h1 {
-  margin-bottom: 1.5rem;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-  text-align: left;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #555;
-}
-
-input {
-  width: 90%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.error-input{
-  border: 1px solid red;
-  transition: 1s;
-}
-
-button {
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  font-size: 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.button-exit{
-  margin-top: 10px;
-}
-
-.toggle-text {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-a {
-  color: #007bff;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-</style>
+<style
+  scoped
+  src="C:\Users\artur\Desktop\Артур\js\free-weekend\free-week-proj\movies\src\assets\styles\account-view.css"
+></style>

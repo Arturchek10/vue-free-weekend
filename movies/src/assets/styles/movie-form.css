@@ -87,6 +87,11 @@
   padding: 20px;
 }
 
+.input-field#genre{
+  width: 95%;
+  padding: 10px;
+}
+
 .input_name, .input-field, select {
   height: 40px; 
   border-radius: 10px;
@@ -134,6 +139,30 @@
   font-size: 24px;
 }
 
+.rating-background{
+  display: inline-block;
+  background: rgba(208, 207, 207, 0.6);
+  padding: 4px;
+  border-radius: 10%;
+  transition: 1s;
+}
+
+.rating-background-top{
+  display: inline-block;
+  background: rgba(16, 255, 18, 0.6);
+  padding: 4px;
+  border-radius: 10%;
+  transition: 1s;
+}
+
+.rating-background-low{
+  display: inline-block;
+  background: rgba(253, 28, 28, 0.6);
+  padding: 4px;
+  border-radius: 10%;
+  transition: 1s;
+}
+
 .rating-value {
   display: inline-block;
   width: 30px; 
@@ -164,6 +193,10 @@
   padding: 5px 0 10px 6px;
   width: 265px;
   border-radius: 10px;
+}
+.suggestions-list li{
+  border-bottom: 2px rgba(122, 112, 112, .3) solid;
+  
 }
 .suggestions-list li:hover{
   /* opacity: .5; */

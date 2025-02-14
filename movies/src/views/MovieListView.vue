@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @keyup.escape="close-form" >
     <div v-if="!isLoading && movieStore.movies.length" class="button-div">
       <button class="add-movie-btn" @click="openForm">add movie</button>
     </div>
@@ -10,7 +10,7 @@
       <h1 class="none-cards-text">нет фильмов для просмотра</h1>
       <button class="add-new-movie-btn" @click='openForm'>add new movie</button>
     </div>
-    <MovieForm :formIsOpen="formIsOpen" @create-card="createCard" @close-form="closeForm" />
+    <MovieForm :formIsOpen="formIsOpen" @create-card="createCard" @closeForm="closeForm" />
   </div>
 </template>
 

@@ -14,8 +14,8 @@
         <router-link class="under-menu-link" :to="{name: 'viewedFilms'}"> просмотренные</router-link>
       </div>
     </div>
-    <div v-if="isLoggedIn" class="user-login">
-      <span>{{ username }}</span>
+    <div class="user-login">
+      <span>{{username}}</span>
     </div>
     <div class="account-icon">
       <router-link class="menu-link" :to="{name: 'account'}">
@@ -27,9 +27,20 @@
 </template>
 
 <script>
+  import { useUserStore } from '@/assets/stores/user';
 
   export default{
-    props: ["isLoggedIn", "username"],
+    methods:{
+      
+    },
+
+    computed: {
+      username() {
+        const userStore = useUserStore();
+        console.log(userStore.username);
+        return userStore.username; 
+    },
+    }
   };
 
 </script>
@@ -75,15 +86,20 @@
 }
 .account-icon{
   position: fixed;
-  transform: translate(780px, 5px);
+  transform: translate(780px, 3px);
 }
 .icon-image-acc{
   position: fixed;
   display: block;
   height: 35px;
-  /* padding-left: 70px;
-  padding-top: 3px; */
   cursor: pointer;
+  opacity: .6;
+  transition: 1s;
+
+}
+.icon-image-acc:hover{
+  opacity: 1;
+  transition: 1s;
 }
 #list-icon{
   width: 30px;
@@ -122,7 +138,7 @@
 
 .user-login{
   position: fixed;
-  transform: translate(620px, 8px);
+  transform: translate(640px, 8px);
   font-size: 21px;
   color: #C8ACD6;
 }
